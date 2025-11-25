@@ -1,0 +1,7 @@
+- name: Debug variable for testing
+  debug:
+    msg: 
+      - "weblogic_domain_home: {{weblogic_domain_home}}"
+      - "weblogic_user: {{weblogic_user}}"
+      - "weblogic_group: {{weblogic_group}}"
+
