@@ -1,8 +1,5 @@
 - name: "Weblogic Installation on specific nodes"
   hosts: weblogic
-  vars_files:
-    - ../inventories/{{env}}/group_vars/mount_vars.yml
-    - ../inventories/{{env}}/group_vars/weblogic_vars.yml
   become: yes
   # roles:
   #   - weblogic
@@ -11,5 +8,3 @@
     - name: Installing WebLogic
       import_role:
         name: weblogic
-
-...
