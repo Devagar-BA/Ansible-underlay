@@ -1,0 +1,22 @@
+- name: Load subscription variables
+  include_vars: ../vars/subscription_vars.yml
+
+- name: Registration To Satellite
+  shell: >
+        bash -c "curl -sS  --insecure 'https://{{ satellite_host }}:{{ satellite_port }}/register?activation_keys={{default_activation_key | urlencode }}&force=true&ignore_subman_errors=true&operatingsystem_id=8&organization_id=1&update_packages=false' -H 'Authorization: {{authorization_token}}'  | bash" && subscription-manager config --rhsm.manage_repos=1
+  register: curl_result
+
+- name: Register system with subscription-manager CLI
+  command: >
+      subscription-manager register
+      --activationkey="{{ activation_key }}"
+      --org="{{ organization }}"
+      --force
+
+- name: Enable all disabled subscription-manager repos
+  shell: |
+    for repo in $(subscription-manager repos --list | awk '/Repo ID/ {print $3}'); do
+      subscription-manager repos --enable=$repo
+    done
+  become: yes
+

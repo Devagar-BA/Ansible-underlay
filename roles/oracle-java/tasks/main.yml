@@ -1,0 +1,19 @@
+---
+- name: Check the bea folder availability
+  file:
+    path: /opt/bea
+    state: directory
+    mode: "0755"
+
+- name: Extract jdk into /opt/bea
+  unarchive:
+    src: /tmp/{{jdk_tar}}
+    dest: /opt/bea
+
+- name: Find the extracted JDK directory under /opt/bea
+  shell: "ls -td /opt/bea/oracle* | head -1"
+  register: lts_jdk
+
+- name: Set fact for latest extracted dir
+  set_fact:
+    jdk_dir: "{{ lts_jdk.stdout | basename }}"

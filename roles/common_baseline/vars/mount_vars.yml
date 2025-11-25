@@ -1,0 +1,13 @@
+---
+lvm_vgs:
+  - name: vg_app
+    expected_size_gb: 100
+    devices:
+      - name: /dev/sdc
+    logical_volumes:
+      - name: lv_webserver
+        size: 30G
+        mount_point: /mnt/webserver
+      - name: lv_controlm
+        size: 25G
+        mount_point: /controlm

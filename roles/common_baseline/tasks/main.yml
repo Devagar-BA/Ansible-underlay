@@ -1,0 +1,8 @@
+#- name: Include Subscription tasks
+#  include_tasks: subscription.yml
+
+#- name: Load mount variables
+#  include_vars: ../vars/mount_vars.yml
+
+- name: Include mount tasks
+  include_tasks: mount.yml

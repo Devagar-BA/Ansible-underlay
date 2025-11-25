@@ -1,0 +1,25 @@
+- name: Install specified Java package
+  yum:
+    name: "{{ java_package }}"
+    state: present
+
+- name: Configure alternatives for java binary
+  command: >
+    alternatives --install /usr/bin/java java {{ java_bin_path }} {{ alternative_priority }}
+  register: alt_install_result
+
+- name: output of java register
+  debug:
+    msg: "{{alt_install_result}}"
+
+- name: Set default java alternative
+  command: alternatives --set java {{ java_bin_path }}
+
+- name: Verify java version
+  command: java -version
+  register: java_version_output
+  ignore_errors: yes
+
+- name: Show java version output
+  debug:
+    msg: "{{java_version_output}}"

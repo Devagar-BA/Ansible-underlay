@@ -1,0 +1,90 @@
+---
+#- name: Load mount variables
+#  include_vars: ../vars/mount_vars.yml
+
+- name: Install LVM2 package
+  package:
+    name: lvm2
+    state: present
+
+- name: Get lsblk info in JSON
+  command: lsblk --json -b
+  register: lsblk_json
+  changed_when: false
+
+- name: Detect device for each VG by matching size
+  vars:
+    expected_size_bytes: "{{ item.expected_size_gb * 1024 * 1024 * 1024 }}"
+  set_fact:
+    matched_device: "{{ lsblk_json.stdout | from_json | json_query('blockdevices[?type==`disk` && size==`' + expected_size_bytes | string + '`].name') | first }}"
+  loop: "{{ lvm_vgs }}"
+
+
+- name: Fail if no matching device found
+  fail:
+    msg: "No device found matching size {{ expected_size_gb }} GB"
+  when: matched_device is not defined or matched_device == ""
+
+- name: Set full device path
+  set_fact:
+    actual_device: "/dev/{{ matched_device }}"
+
+- name: Debug detected device
+  debug:
+    msg: "Detected device path is {{ actual_device }}"
+
+- name: Create Volume Groups (and Physical Volumes on devices)
+  community.general.lvg:
+    vg: "{{ item.name }}"
+    pvs: "{{ actual_device }}"
+    state: present
+  loop: "{{ lvm_vgs }}"
+
+- name: Create Logical Volumes
+  lvol:
+    vg: "{{ item.0.name }}"
+    lv: "{{ item.1.name }}"
+    size: "{{ item.1.size }}"
+    state: present
+  loop: "{{ lvm_vgs | subelements('logical_volumes') }}"
+  loop_control:
+    label: "{{ item.1.name }}"
+
+- name: Format Logical Volumes with ext4 if not formatted
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{ item.0.name }}/{{ item.1.name }}"
+  loop: "{{ lvm_vgs | subelements('logical_volumes') }}"
+  loop_control:
+    label: "{{ item.1.name }}"
+
+- name: Ensure mount points exist
+  file:
+    path: "{{ item.1.mount_point }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ lvm_vgs | subelements('logical_volumes') }}"
+  loop_control:
+    label: "{{ item.1.mount_point }}"
+
+- name: Mount Logical Volumes
+  ansible.posix.mount:
+    path: "{{ item.1.mount_point }}"
+    src: "/dev/{{ item.0.name }}/{{ item.1.name }}"
+    fstype: ext4
+    state: mounted
+  loop: "{{ lvm_vgs | subelements('logical_volumes') }}"
+  loop_control:
+    label: "{{ item.1.mount_point }}"
+
+- name: Persist mounts in fstab
+  mount:
+    path: "{{ item.1.mount_point }}"
+    src: "/dev/{{ item.0.name }}/{{ item.1.name }}"
+    fstype: ext4
+    opts: defaults
+    state: present
+  loop: "{{ lvm_vgs | subelements('logical_volumes') }}"
+  loop_control:
+    label: "{{ item.1.mount_point }}"
+

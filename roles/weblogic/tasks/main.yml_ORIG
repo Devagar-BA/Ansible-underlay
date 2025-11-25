@@ -1,0 +1,137 @@
+---
+#- name: Include mount tasks
+#  include_role:
+#    name: common_baseline
+#    tasks_from: mount.yml
+
+- name: Ensure group exists with specified gid
+  ansible.builtin.group:
+    name: "{{ item.group_name }}"
+    gid: "{{ item.group_id }}"
+    state: present
+  loop: "{{ users }}"
+
+- name: Ensure user exists with specified uid and group
+  ansible.builtin.user:
+    name: "{{ item.user_name }}"
+    uid: "{{ item.user_id }}"
+    group: "{{ item.group_name }}"
+    state: present
+  loop: "{{ users }}"
+
+#- name: Ensure Middleware home directory exists
+#  file:
+#    path: "{{ weblogic_install_dir }}"
+#    state: "directory"
+#    owner: "{{ weblogic_user }}"
+#    group: "{{ weblogic_group }}"
+#    mode: "0755"
+
+#- name: Install specified Java package
+#  yum:
+#    name: "{{ java_package }}"
+#    state: present
+
+- name: Copy Oracle jdk jar to target server
+  copy:
+    src: "files/jdk.tar.gz"
+    dest: "/opt/bea/jdk.tar.gz"
+    mode: "0755"
+    owner: "{{ weblogic_user }}"
+    group: "{{ weblogic_group }}"
+
+- name: Extract jdk tar file to specific directory
+  shell: "tar -xpf /opt/bea/jdk.tar.gz -C {{weblogic_install_dir}}"
+  become: true
+
+#- name: Configure alternatives for java binary
+#  command: >
+#    alternatives --install /usr/bin/java java {{ java_bin_path }} {{ alternative_priority }}
+#  register: alt_install_result
+
+#- name: output of java register
+#  debug:
+#    msg: "{{alt_install_result}}"
+
+#- name: Set default java alternative
+#  command: alternatives --set java {{ java_bin_path }}
+
+#- name: Verify java version
+#  command: java -version
+#  register: java_version_output
+#  ignore_errors: yes
+
+#- name: Show java version output
+#  debug:
+#    msg: "{{java_version_output}}"
+
+- name: Copy WebLogic installer tar to target server
+  copy:
+    src: "files/WebLogic_12.tar"
+    dest: "{{weblogic_install_dir}}/WebLogic_12.tar"
+    mode: "0755"
+    owner: "{{ weblogic_user }}"
+    group: "{{ weblogic_group }}"
+
+- name: Extract tar file to specific directory
+  shell: "tar -xpf {{weblogic_install_dir}}/WebLogic_12.tar -C {{weblogic_install_dir}}"
+  become: true
+
+- name: Install the weblogic using rpm
+  command: "rpm -ivh {{weblogic_install_dir}}/WebLogic_12.2.1.4/WLSv12214_64_220329-1-1.x86_64.rpm"
+  become: true
+  ignore_errors: yes
+
+- name: Find server directory dynamically
+  find:
+    paths: /opt/bea
+    file_type: directory
+    patterns: "server*_*"
+    recurse: no
+  register: found_server_dirs
+
+- name: Copy domain creation tar to target server
+  copy:
+    src: "files/create_wls_env_v12.2.tar"
+    dest: "{{found_server_dirs.files[0].path}}/create_wls_env_v12.2.tar"
+    mode: "0755"
+    owner: "{{ weblogic_user }}"
+    group: "{{ weblogic_group }}"
+
+- name: Extract tar file to specific directory
+  shell: "tar -xpf {{found_server_dirs.files[0].path}}/create_wls_env_v12.2.tar -C {{found_server_dirs.files[0].path}}"
+  become: true
+
+
+- name: Find server directory dynamically
+  find:
+    paths: "{{found_server_dirs.files[0].path}}"
+    file_type: directory
+    patterns: "create*_*"
+    recurse: no
+  register: found_domain_dirs
+
+- name: Update paths in specified files
+  replace:
+    path: "{{found_domain_dirs.files[0].path}}/{{ item }}"
+    regexp: 'server12214_220118'
+    replace: '{{found_server_dirs.files[0].path | basename}}'
+    backup: yes
+  loop: "{{ files_to_update }}"
+
+- name: update domain name in domainInfo
+  replace:
+    path: "{{found_domain_dirs.files[0].path}}/{{domain_file}}"
+    regexp: 'utstest'
+    replace: "{{ansible_server_name}}"
+    backup: yes
+
+- name: Creat domain using createCatalogueStyleSipItem
+  shell: "yes | {{found_domain_dirs.files[0].path}}/createCatalogueStyleSipItem"
+  register: script_ouput
+  ignore_errors: yes
+
+- name: Debug logs for domain creation
+  debug:
+    msg: "{{script_ouput}}"
+    

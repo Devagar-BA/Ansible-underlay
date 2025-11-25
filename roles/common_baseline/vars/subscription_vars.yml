@@ -1,0 +1,7 @@
+default_activation_key: "RHEL9 AWS DC PRD CII"
+activation_key: "RHEL9 AWS DC DROP 0"
+organization: "IAG"
+satellite_host: "le1satelap002.satel-prd.int.iag.cloud"
+satellite_port: 9090
+server_insecure: yes
+authorization_token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMCwiaWF0IjoxNzIzNTMxMjE0LCJqdGkiOiJiNDg2ZjM2NzVkODllZjJmODVjMGM3Zjg1MGQ5OTU3MWE5ZDI2NzU4MDMxMDAzZWYxZWQ3ZmVhMmM1Y2NhYzcxIiwic2NvcGUiOiJyZWdpc3RyYXRpb24jZ2xvYmFsIHJlZ2lzdHJhdGlvbiNob3N0In0.LdDMuq2HW0vEPS9aNUsynCmJFmkiILRpQkEmb8zhiDQ"

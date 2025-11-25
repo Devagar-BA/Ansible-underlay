@@ -1,0 +1,23 @@
+---
+users:
+  - group_name: wgadmin
+    group_id: 35100121
+    user_name: wgadmin
+    user_id: 35100121
+  - group_name: wgapache
+    group_id: 35100120
+    user_name: wgapache
+    user_id: 35100120
+
+weblogic_install_dir: /opt/bea/
+weblogic_user: wgadmin
+weblogic_group: wgadmin
+java_package: "java-1.8.0-openjdk-devel"
+java_bin_path: "/usr/lib/jvm/java-1.8.0-openjdk/bin/java"
+alternative_priority: 2000
+files_to_update:
+   - "setDomainVariable3.sh"
+   - "makeBootDomC.sh"
+   - "makeBootScript.sh"
+   - "createCatalogueStyleSipItem"
+domain_file: "domainInfo"
