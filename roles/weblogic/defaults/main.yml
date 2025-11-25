@@ -1,2 +1,13 @@
----
-# defaults file for weblogic
+weblogic_domain_home: /webserver/weblogic
+weblogic_user: wgadmin
+weblogic_group: wgadmin
+wlst_home: /opt/bea/server12214_220329/wlserver/
+weblogic_admin_user: wgadmin
+weblogic_admin_pass: wgS3rv3r
+jdk_tar: jdk.tar.gz
+weblogic_tar: WebLogic_12.tar
+weblogic_version_dir: WebLogic_12.2.1.4
+rpm_name: WLSv12214_64_220329-1-1.x86_64.rpm
+domain_create_tar: create_wls_env_v12.2.tar
+version_regex: server12214_220118
+server_regex: utstest
