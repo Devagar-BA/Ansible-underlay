@@ -41,6 +41,8 @@ jobs:
             VAULT_OPT="--vault-password-file vault_pass.txt"
           fi
 
+          cd $GITHUB_WORKSPACE
+
           ansible-playbook \
             ${{ inputs.playbook }} \
             -i ${{ inputs.inventory }} \
