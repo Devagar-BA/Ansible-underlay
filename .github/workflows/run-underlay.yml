@@ -32,7 +32,7 @@ jobs:
       - name: Download inventory
         uses: actions/download-artifact@v4
         with:
-          name: Devagar-BA/Ansible-underlay
+          name: app-inventory
           path: .
 
       - name: Run playbook
