@@ -23,9 +23,7 @@ jobs:
     steps:
       - name: Checkout underlay
         uses: actions/checkout@v4
-        with:
-          path: Ansible-underlay
-
+       
       - name: Install Ansible
         run: |
           sudo apt update
@@ -35,10 +33,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app-inventory
-          path: Ansible-overlay
 
       - name: Run playbook
-        working-directory: Ansible-underlay
         run: |
           VAULT_OPT=""
           if [ -f vault_pass.txt ]; then
