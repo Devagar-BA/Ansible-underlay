@@ -32,7 +32,7 @@ jobs:
       - name: Download inventory
         uses: actions/download-artifact@v4
         with:
-          name: app-inventory
+          name: Ansible-overlay
           path: .
 
       - name: Run playbook
