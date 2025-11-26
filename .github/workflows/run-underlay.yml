@@ -1,0 +1,53 @@
+name: Run Underlay
+
+on:
+  workflow_call:
+    inputs:
+      playbook:
+        required: true
+        type: string
+      inventory:
+        required: true
+        type: string
+      extra_vars:
+        required: false
+        type: string
+    secrets:
+      VAULT_PASSWORD:
+        required: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout underlay
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Write vault password
+        if: ${{ secrets.VAULT_PASSWORD != '' }}
+        run: echo "${{ secrets.VAULT_PASSWORD }}" > vault_pass.txt
+
+      - name: Download inventory
+        uses: actions/download-artifact@v4
+        with:
+          name: app-inventory
+          path: .
+
+      - name: Run playbook
+        run: |
+          VAULT_OPT=""
+          if [ -f vault_pass.txt ]; then
+            VAULT_OPT="--vault-password-file vault_pass.txt"
+          fi
+
+          ansible-playbook \
+            ${{ inputs.playbook }} \
+            -i ${{ inputs.inventory }} \
+            -e "${{ inputs.extra_vars }}" \
+            $VAULT_OPT
