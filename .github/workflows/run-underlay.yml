@@ -33,6 +33,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: overlay-artifacts
+      
+      - name: Debug repo info
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Workspace: $GITHUB_WORKSPACE"
+          echo "Branch/Ref: $GITHUB_REF"
+          ls -l "$GITHUB_WORKSPACE"
+
 
       - name: Run playbook
         run: |
