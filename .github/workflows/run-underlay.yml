@@ -43,6 +43,9 @@ jobs:
           echo "Workspace: $GITHUB_WORKSPACE"
           echo "Branch/Ref: $GITHUB_REF"
           ls -l "$GITHUB_WORKSPACE"
+      - name: Check roles
+        run: ls -R roles
+
 
 
       - name: Run playbook
