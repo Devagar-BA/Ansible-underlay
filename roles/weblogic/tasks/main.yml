@@ -4,5 +4,5 @@
       - "weblogic_domain_home: {{weblogic_domain_home}}"
       - "weblogic_user: {{weblogic_user}}"
       - "weblogic_group: {{weblogic_group}}"
-      - "webogic_version: {{wl_version}}
+      - "webogic_version: {{wl_version}}"
 
