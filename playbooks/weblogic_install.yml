@@ -1,5 +1,5 @@
 - name: "Weblogic Installation on specific nodes"
-  hosts: weblogic
+  hosts: localhost
   become: yes
   # roles:
   #   - weblogic
