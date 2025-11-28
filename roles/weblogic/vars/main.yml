@@ -8,7 +8,7 @@ users:
     group_id: 35100120
     user_name: wgapache
     user_id: 35100120
-
+wl_version : 12c
 weblogic_install_dir: /opt/bea/
 weblogic_user: wgadmin
 weblogic_group: wgadmin
