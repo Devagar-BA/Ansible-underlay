@@ -21,11 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout underlay
-        uses: actions/checkout@v4
-        with:
-          repository: Devagar-BA/Ansible-underlay
-          ref: main
+      #- name: Checkout underlay
+      #  uses: actions/checkout@v4
+      #  with:
+       #   repository: Devagar-BA/Ansible-underlay
+       #   ref: main
        
       - name: Install Ansible
         run: |
